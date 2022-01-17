@@ -1,8 +1,5 @@
-const http = require('http');
 const fs = require('fs');
-
-const hostname = 'localhost';
-const port = 3000;
+const myers = require('myers-diff');
 
 const router = require('express').Router();
 
@@ -16,7 +13,35 @@ router.get('/', (req,res) => {
     var numExt = parseInt(fileNum.slice(6));
     let oldFileData = fs.readFileSync(dir + '/changes/' + fileNum + '/old/' + fileList[numExt],'utf-8');
     let newFileData = fs.readFileSync(dir + '/changes/' + fileNum + '/new/' + fileList[numExt],'utf-8');
+    
+    var preFileNum = Number(fileNum.slice(6)) - 1;
+    var nextFileNum = Number(fileNum.slice(6)) + 1;
 
+    if (preFileNum < 10) {
+        preFileNum = "changes00" + preFileNum;
+    }
+    else if (preFileNum < 100) {
+        preFileNum = "changes0" + preFileNum;
+    }
+    else {
+        preFileNum = "changes" + preFileNum;
+    }
+
+    if (nextFileNum < 10) {
+        nextFileNum = "changes00" + nextFileNum;
+    }
+    else if (preFileNum < 100) {
+        nextFileNum = "changes0" + nextFileNum;
+    }
+    else {
+        nextFileNum = "changes" + nextFileNum;
+    }
+
+    const lhs = oldFileData;
+    const rhs = newFileData;
+    
+    const diff = myers.diff(lhs, rhs);
+    
     var template = `
     <!DOCTYPE html>
     <html>
@@ -40,7 +65,17 @@ router.get('/', (req,res) => {
                 height: 100%;
                 justify-content: center;
                 }
-                #inner {
+                .line_add {
+                    background-color: #e6ffec;
+                }
+                .line_del {
+                    background-color: #ffebe9;
+                }
+                #inner_left {
+                    background-color: #f4f4f4;
+                    word-break:break-all;
+                }
+                #inner_right {
                     background-color: #f4f4f4;
                     word-break:break-all;
                 }
@@ -121,30 +156,93 @@ router.get('/', (req,res) => {
             </ul>
             
             <br>
-            
+             <!-- <div class="flex_container">
+                <a class="pre" href="/marker?fileNum=${preFileNum}">Previous</button>
+                <a class="pre" onClick="location.href='/marker?fileNum=${nextFileNum}'">Next</button>
+            </div> -->
+
             <div class="flex_container">
                 <div id="left">
-                    <pre><code class="java" id="inner">
-                        ${oldFileData}
+                    <pre><code class="java" id="inner_left">`;
+
+    var lhsPos = [];
+    var rhsPos = [];
+    for (var i = 0; i < diff.length; i++) {
+        lhsPos.push(diff[i].lhs.pos);
+        rhsPos.push(diff[i].rhs.pos);
+    }
+    
+    var cnt = 0;
+    for (var i = 0; i < oldFileData.length; i++) {
+        if (lhsPos.includes(i)) {
+            if ("add" in diff[cnt].lhs) {
+                template += `<span class="line_add">`;
+            }
+            else {
+                template += `<span class="line_del">`;
+            }
+            for (var j = 0; j < diff[cnt].lhs.length; j++) {
+                template += oldFileData[i];
+                i++;
+            }
+            if (diff[cnt].lhs.length != 0) {
+                template += oldFileData[i];
+                template += `</span>`;
+            }
+            else {
+                template += `</span>`;
+                template += oldFileData[i];
+            }
+            cnt++;
+        }
+        else {
+            template += oldFileData[i];
+        }
+    }
+
+    template += `
                     </code></pre>                    
                 </div>
                 <div id="middle">&nbsp</div>
-                
+    
                 <div id="right">
-                    <pre><code class="java" id="inner">
-                        ${newFileData}
+                    <pre><code class="java" id="inner_right">`;
+    var cnt = 0;
+    for (var i = 0; i < newFileData.length; i++) {
+        if (rhsPos.includes(i)) {
+            if ("add" in diff[cnt].rhs) {
+                template += `<span class="line_add">`;
+            }
+            else {
+                template += `<span class="line_del">`;
+            }
+            for (var j = 0; j < diff[cnt].rhs.length; j++) {
+                template += newFileData[i];
+                i++;
+            }
+            if (diff[cnt].rhs.length != 0) {
+                template += newFileData[i];
+                template += `</span>`;
+            }
+            else {
+                template += `</span>`;
+                template += newFileData[i];
+            }
+            cnt++;
+        }
+        else {
+            template += newFileData[i];
+        }
+    }
+
+    template += `
                     </code></pre>    
                 </div>
             </div>
-    
         </body>
-    </html>
-        `;
-    res.end(template);
-});
+    </html>`;
 
-router.get('/login', (req,res) => {
-    res.send('login');
+    res.end(template);
 });
 
 module.exports = router;
