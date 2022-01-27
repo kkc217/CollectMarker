@@ -1,0 +1,6 @@
+
+> myers-diff@2.0.1 start /exp/CollectMarker
+> node index
+
+Server running at http://117.17.198.35:3000
+[0mGET /marker?fileNum=change490 [32m200 [0m7.017 ms - -[0m

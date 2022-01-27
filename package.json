@@ -24,6 +24,8 @@
   },
   "homepage": "https://github.com/wickedest/myers-diff",
   "dependencies": {
+    "ejs": "^3.1.6",
+    "express": "^4.17.2",
     "myers-diff": "^2.0.1"
   },
   "devDependencies": {
@@ -54,6 +56,6 @@
     "test:watch": "mocha --recursive --watch",
     "test:nocoverage": "mocha --recursive",
     "lint": "eslint src test",
-    "start": "node index"
+    "start": "node app"
   }
 }

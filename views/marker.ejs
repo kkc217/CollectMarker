@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>marker</title>
+        <style>
+            body {
+                background-color: #ffffff;
+            }
+            pre {
+                overflow-x: hidden;
+            }
+            code {
+                overflow-x: scroll;
+            }
+
+            .move_flex_container {
+                display: flex;
+                border: 5px;
+                padding: 30px;
+                height: 5px;
+                justify-content: space-between;
+            }
+            .pageMove {
+                text-decoration: none;
+                color: #557cbf;
+                font-weight: bold;
+            }
+
+            .dropbtn {
+                border: none;
+            }
+            .dropdown {
+                position: relative;
+                display: inline-block;
+            }
+            .dropdown-content {
+                display: none;
+                position: absolute;
+                text-align: center;
+                background-color: #ffffff;
+                width: 70px;
+                box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+                z-index: 1;
+            }
+            .dropdown-content a {
+                color: #000000;
+                padding: 5px 10px;
+                text-decoration: none;
+                display: block;
+            }
+            .dropdown:hover .dropdown-content {
+                display: block;
+            }
+
+            .flex_container {
+                display: flex;
+                border: 6px;
+                padding: 10px;
+                height: 100%;
+                justify-content: center;
+            }
+            #line_add {
+                background-color: #e6ffec;
+            }
+            #line_del {
+                background-color: #ffebe9;
+            }
+            #inner_left {
+                background-color: #f4f4f4;
+                word-break:break-all;
+            }
+            #inner_right {
+                background-color: #f4f4f4;
+                word-break:break-all;
+            }
+            #left {
+                background-color: #f4f4f4;
+                flex: 0.49;
+                overflow-x: hidden;
+                max-width: 1000px;
+            }
+            #right {
+                background-color: #f4f4f4;
+                flex: 0.49;
+                overflow-x: hidden;
+                max-width: 1000px;
+            }
+            #middle {
+                width: 10px;
+            }
+            #nav {
+                list-style:none;
+                height: 40px;
+                padding: 5px 1px;
+                margin: 0;
+            }
+            #nav select{
+                float: right;
+                position: relative;
+                margin: 5px 30px;
+                padding: 0;
+            }
+            select {
+                width: 150px;
+                height: 30px;
+                font-family: inherit;
+                border: 1px solid #999;
+                border-radius: 0px;
+                
+            }
+        </style>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/intellij-light.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/languages/java.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+    </head>
+    <body>
+        <ul id="nav">
+            <select name="jump" id="jump" onchange="location.href=this.value">
+                <% for (var i = 1; i <= 500; i++) { %>
+                    <% if (currentFileName == mkFileName(i)) { %>
+                        <option value="/marker?fileNum=<%= mkFileName(i) %>" selected><%= mkFileName(i) %></option>
+                    <% } else { %> 
+                    <option value="/marker?fileNum=<%= mkFileName(i) %>"><%= mkFileName(i) %></option>
+                    <% } %> 
+                <% } %> 
+            </select>
+        </ul>
+
+        <br>
+        
+        <div class="move_flex_container">
+            <a class="pageMove" id="movePre" href="/marker?fileNum=<%= mkFileName(parseInt(currentFileName.slice(6)) - 1) %>">Previous</a>
+            <a class="pageMove" id="moveNext" href="/marker?fileNum=<%= mkFileName(parseInt(currentFileName.slice(6)) + 1) %>">Next</a>
+        </div>
+
+        <div class="flex_container">
+            <div id="left">
+                <pre><code class="java" id="inner_left">
+                    <%- lhsTemplate %>
+                </code></pre>                    
+            </div>
+            <div id="middle">&nbsp</div>
+            <div id="right">
+                <pre><code class="java" id="inner_right">
+                    <%- rhsTemplate %>
+                </code></pre>                    
+            </div>
+    </body>
+</html>
